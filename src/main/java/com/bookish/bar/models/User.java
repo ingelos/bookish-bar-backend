@@ -1,6 +1,9 @@
 package com.bookish.bar.models;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 
@@ -18,10 +21,10 @@ public class User {
 
     @Setter(AccessLevel.NONE)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private Long id;
 
-    @Column
+    @Column(unique =true, nullable = false)
     private String username;
     @Column
     private String email;
@@ -44,4 +47,14 @@ public class User {
     private Set<Authority> authorities = new HashSet<>();
 
 
+    public User(String username, String email, String password, String firstname,  String lastname, String bio, Set<Authority> authorities) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.firstname = firstname;
+        this.lastname = lastname;
+        this.bio = bio;
+        this.authorities = authorities;
+
+    }
 }

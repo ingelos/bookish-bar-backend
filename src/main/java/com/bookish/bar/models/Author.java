@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -17,11 +18,20 @@ import java.util.List;
 public class Author {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column
     private String name;
+
+    @Column
+    private String bio;
+
+    @Column
+    private String birthDate;
+
+    @ElementCollection
+    private List<Integer> photos;
+
 
     @Column
     @ManyToMany(mappedBy = "authors")
