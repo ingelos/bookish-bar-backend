@@ -1,5 +1,6 @@
 package com.bookish.bar.dtos.mappers;
 
+import com.bookish.bar.dtos.dtos.UpdateUserDetailsDto;
 import com.bookish.bar.dtos.inputDtos.UserInputDto;
 import com.bookish.bar.dtos.outputDtos.UserOutputDto;
 import com.bookish.bar.exceptions.ResourceNotFoundException;
@@ -10,33 +11,26 @@ import java.util.List;
 
 public class UserMapper {
 
-    public static User userFromInputDtoToModel(UserInputDto dto, String encodedPassword) {
+    public static User userToModel(UserInputDto dto, String encodedPassword) {
         return new User(
                 dto.getUsername(),
                 dto.getEmail(),
                 encodedPassword,
-                dto.getFirstname(),
-                dto.getLastname(),
-                dto.getBio(),
                 AuthorityMapper.fromDtoToSet(dto.getAuthorities())
         );
     }
 
     public static UserOutputDto userFromModelToOutputDto(User user) {
         UserOutputDto dto = new UserOutputDto();
-
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
-        dto.setFirstname(user.getFirstname());
-        dto.setLastname(user.getLastname());
-        dto.setBio(user.getBio());
-        dto.setBookLists(user.getBookLists());
         dto.setAuthorities(user.getAuthorities());
         return dto;
     }
 
-    public static List<UserOutputDto> userModelListToOutputList(List<User> users) {
+
+    public static List<UserOutputDto> userToList(List<User> users) {
         if(users.isEmpty()) {
             throw new ResourceNotFoundException("No users found.");
         }
@@ -44,5 +38,20 @@ public class UserMapper {
         users.forEach((user) -> userOutputDtoList.add(userFromModelToOutputDto(user)));
         return userOutputDtoList;
     }
+
+    public static User updateUserToModel(User user, UpdateUserDetailsDto updateUserDto) {
+        if (updateUserDto.getUsername() != null) {
+            user.setUsername(updateUserDto.getUsername());
+        }
+        if (updateUserDto.getEmail() != null) {
+            user.setEmail(updateUserDto.getEmail());
+        }
+        return user;
+    }
+
+    public static void updatePasswordToModel(User existingUser, String encodedPassword) {
+        existingUser.setPassword(encodedPassword);
+    }
+
 
 }

@@ -21,14 +21,14 @@ public class BookList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    @JoinColumn(name = "userBookLists")
     @ManyToOne
-    private User user;
+    private Profile profile;
 
-    @Column
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
+//    @Column
+//    @ManyToOne
+//    @JoinColumn(name = "book_id")
+//    private Book book;
 
     @Column
     @Enumerated(EnumType.STRING)

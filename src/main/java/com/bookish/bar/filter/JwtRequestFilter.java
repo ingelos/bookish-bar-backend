@@ -12,10 +12,13 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-public class JwtRequestFilter {
+@Component
+public class JwtRequestFilter extends OncePerRequestFilter {
 
     private final CustomUserDetailService userDetailService;
     private final JwtUtil jwtUtil;
@@ -35,12 +38,14 @@ public class JwtRequestFilter {
 
         String username = null;
         String jwt = null;
+        Long id = null;
 
         if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
 
             try {
                 username = jwtUtil.extractUsername(jwt);
+                id = jwtUtil.extractId(jwt);
             } catch (ExpiredJwtException ex) {
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                 response.setContentType("application/json");

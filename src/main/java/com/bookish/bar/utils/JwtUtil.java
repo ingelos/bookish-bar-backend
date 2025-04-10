@@ -1,11 +1,14 @@
 package com.bookish.bar.utils;
 
+import com.bookish.bar.models.User;
+import com.bookish.bar.repositories.UserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
@@ -17,6 +20,12 @@ import java.util.function.Function;
 @Service
 public class JwtUtil {
     private final static String SECRET_KEY = "eensecretkeybedenkenisnognietzomakkelijkkkkkkkkkkk";
+
+    private final UserRepository userRepository;
+
+    public JwtUtil(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
@@ -49,7 +58,11 @@ public class JwtUtil {
     }
 
     public String generateToken(UserDetails userDetails) {
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
         Map<String, Object> claims = new HashMap<>();
+        claims.put("id", user.getId());
+
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -67,4 +80,10 @@ public class JwtUtil {
         final String username = extractUsername(token);
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
+
+    public Long extractId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get("id", Long.class);
+    }
+
 }
