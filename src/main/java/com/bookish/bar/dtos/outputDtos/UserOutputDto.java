@@ -15,11 +15,7 @@ public class UserOutputDto {
     private Long id;
     private String username;
     private String email;
-    private String password;
-    private String firstname;
-    private String lastname;
-    private String bio;
-    private List<BookList> bookLists;
+
     private List<String> authorities;
 
     public void setAuthorities(Set<Authority> authorities) {
