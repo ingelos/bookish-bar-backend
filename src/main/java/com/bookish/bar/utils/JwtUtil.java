@@ -60,8 +60,11 @@ public class JwtUtil {
     public String generateToken(UserDetails userDetails) {
         User user = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
         Map<String, Object> claims = new HashMap<>();
+
         claims.put("id", user.getId());
+        claims.put("username", user.getUsername());
 
         return createToken(claims, userDetails.getUsername());
     }
@@ -85,5 +88,7 @@ public class JwtUtil {
         Claims claims = extractAllClaims(token);
         return claims.get("id", Long.class);
     }
+
+
 
 }

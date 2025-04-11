@@ -48,8 +48,9 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users").permitAll()
                         .requestMatchers(HttpMethod.GET, "/users").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/users/{id}").hasAnyAuthority("USER", "ADMIN")
-                        .requestMatchers(HttpMethod.PATCH, "/users/{id}/update").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.PATCH, "/users/{id}/password").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/{id}/change-email").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/{id}/change-username").hasAnyAuthority("USER", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/users/{id}/change-password").hasAnyAuthority("USER", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}").hasAnyAuthority("USER", "ADMIN")
 
                         .requestMatchers(HttpMethod.GET, "/users/{id}/authorities").hasAuthority("ADMIN")

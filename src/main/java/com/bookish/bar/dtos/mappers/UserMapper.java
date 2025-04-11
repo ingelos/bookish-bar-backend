@@ -1,6 +1,5 @@
 package com.bookish.bar.dtos.mappers;
 
-import com.bookish.bar.dtos.dtos.UpdateUserDetailsDto;
 import com.bookish.bar.dtos.inputDtos.UserInputDto;
 import com.bookish.bar.dtos.outputDtos.UserOutputDto;
 import com.bookish.bar.exceptions.ResourceNotFoundException;
@@ -20,7 +19,7 @@ public class UserMapper {
         );
     }
 
-    public static UserOutputDto userFromModelToOutputDto(User user) {
+    public static UserOutputDto userModelToDto(User user) {
         UserOutputDto dto = new UserOutputDto();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
@@ -35,22 +34,8 @@ public class UserMapper {
             throw new ResourceNotFoundException("No users found.");
         }
         List<UserOutputDto> userOutputDtoList = new ArrayList<>();
-        users.forEach((user) -> userOutputDtoList.add(userFromModelToOutputDto(user)));
+        users.forEach((user) -> userOutputDtoList.add(userModelToDto(user)));
         return userOutputDtoList;
-    }
-
-    public static User updateUserToModel(User user, UpdateUserDetailsDto updateUserDto) {
-        if (updateUserDto.getUsername() != null) {
-            user.setUsername(updateUserDto.getUsername());
-        }
-        if (updateUserDto.getEmail() != null) {
-            user.setEmail(updateUserDto.getEmail());
-        }
-        return user;
-    }
-
-    public static void updatePasswordToModel(User existingUser, String encodedPassword) {
-        existingUser.setPassword(encodedPassword);
     }
 
 

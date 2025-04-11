@@ -25,10 +25,12 @@ public class ProfileService {
 
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
+    private final SecurityUtils securityUtils;
 
-    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository) {
+    public ProfileService(UserRepository userRepository, ProfileRepository profileRepository, SecurityUtils securityUtils) {
         this.userRepository = userRepository;
         this.profileRepository = profileRepository;
+        this.securityUtils = securityUtils;
     }
 
 
@@ -37,7 +39,7 @@ public class ProfileService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        SecurityUtils.assertAuthenticatedUser(user.getUsername());
+        securityUtils.assertUserIsOwner(id);
 
         if (user.getProfile() != null) {
             throw new IllegalStateException("User already has a profile");
@@ -76,9 +78,12 @@ public class ProfileService {
 
 
     @Transactional
-    public ProfileOutputDto getProfileByUserId(Long id) {
+    public ProfileOutputDto getProfileByUserId(Long id) throws AccessDeniedException {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        securityUtils.assertUserIsOwner(id);
+
         Profile profile = user.getProfile();
 
         if (profile == null) {
@@ -94,7 +99,7 @@ public class ProfileService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        SecurityUtils.assertAuthenticatedUser(user.getUsername());
+        securityUtils.assertUserIsOwner(id);
 
         Profile existingProfile = user.getProfile();
 
@@ -116,7 +121,7 @@ public class ProfileService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        SecurityUtils.assertAuthenticatedUser(user.getUsername());
+        securityUtils.assertUserIsOwner(id);
 
         Profile profile = user.getProfile();
 

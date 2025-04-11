@@ -16,7 +16,6 @@ public class UserOutputDto {
     private String username;
     private String email;
 
-//    private List<BookList> bookLists;
     private List<String> authorities;
 
     public void setAuthorities(Set<Authority> authorities) {

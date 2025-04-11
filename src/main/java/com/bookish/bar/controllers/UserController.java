@@ -1,7 +1,9 @@
 package com.bookish.bar.controllers;
 
-import com.bookish.bar.dtos.dtos.UpdatePasswordDto;
-import com.bookish.bar.dtos.dtos.UpdateUserDetailsDto;
+import com.bookish.bar.dtos.dtos.ChangePasswordDto;
+import com.bookish.bar.dtos.dtos.ChangeEmailDto;
+import com.bookish.bar.dtos.dtos.ChangeUsernameDto;
+import com.bookish.bar.dtos.dtos.UserResponseDto;
 import com.bookish.bar.dtos.inputDtos.ProfileInputDto;
 import com.bookish.bar.dtos.inputDtos.UserInputDto;
 import com.bookish.bar.dtos.outputDtos.ProfileOutputDto;
@@ -70,15 +72,21 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{id}/update")
-    public ResponseEntity<UserOutputDto> updateUserDetails(@PathVariable("id") Long id, @Valid @RequestBody UpdateUserDetailsDto updateUserDetailsDto) throws AccessDeniedException {
-        UserOutputDto updatedUser = userService.updateUserDetails(id, updateUserDetailsDto);
-        return ResponseEntity.ok().body(updatedUser);
+    @PutMapping("/{id}/change-username")
+    public ResponseEntity<UserResponseDto> changeUsername(@PathVariable("id") Long id, @Valid @RequestBody ChangeUsernameDto changeUsernameDto) throws AccessDeniedException {
+        UserResponseDto responseDto = userService.changeUsername(id, changeUsernameDto);
+        return ResponseEntity.ok(responseDto);
     }
 
-    @PatchMapping("/{id}/password")
-    public ResponseEntity<Void> updatePassword(@PathVariable("id") Long id, @Valid @RequestBody UpdatePasswordDto updatePasswordDto) {
-        userService.updatePassword(id, updatePasswordDto);
+    @PutMapping("/{id}/change-email")
+    public ResponseEntity<UserOutputDto> changeEmail(@PathVariable("id") Long id, @Valid @RequestBody ChangeEmailDto changeEmailDto) throws AccessDeniedException {
+        UserOutputDto updatedUser = userService.changeEmail(id, changeEmailDto);
+        return ResponseEntity.ok(updatedUser);
+    }
+
+    @PutMapping("/{id}/change-password")
+    public ResponseEntity<Void> updatePassword(@PathVariable("id") Long id, @Valid @RequestBody ChangePasswordDto changePasswordDto) throws AccessDeniedException {
+        userService.changePassword(id, changePasswordDto);
         return ResponseEntity.noContent().build();
     }
 
@@ -100,7 +108,7 @@ public class UserController {
 
 
     @GetMapping("/{id}/profile")
-    public ResponseEntity<ProfileOutputDto> getProfileByUserId(@PathVariable("id") Long id) {
+    public ResponseEntity<ProfileOutputDto> getProfileByUserId(@PathVariable("id") Long id) throws AccessDeniedException {
         ProfileOutputDto profileDto = profileService.getProfileByUserId(id);
         return ResponseEntity.ok(profileDto);
     }
@@ -138,7 +146,7 @@ public class UserController {
         Resource resource  = photoService.downLoadFile(fileName);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachement; filename=\"" + fileName + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
                 .body(resource);
     }
 

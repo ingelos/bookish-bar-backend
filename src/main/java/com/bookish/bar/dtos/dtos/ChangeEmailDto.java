@@ -5,13 +5,11 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class UpdateUserDetailsDto {
+public class ChangeEmailDto {
 
-
-    private String username;
     @Email(message = "Invalid email")
     private String email;
     @NotBlank(message= "Current password is required")
-    private String currentPassword;
+    private String password;
 
 }
