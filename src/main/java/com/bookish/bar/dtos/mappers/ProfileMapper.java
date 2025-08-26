@@ -22,17 +22,15 @@ public class ProfileMapper {
     }
 
     public static ProfileOutputDto profileToDto(Profile profile) {
-        ProfileOutputDto outputDto = new ProfileOutputDto();
-        outputDto.setId(profile.getId());
-        outputDto.setUsername(profile.getUser().getUsername());
-        outputDto.setFirstname(profile.getFirstname());
-        outputDto.setLastname(profile.getLastname());
-        outputDto.setAbout(profile.getAbout());
+        ProfileOutputDto dto = new ProfileOutputDto();
+        dto.setId(profile.getId());
+        dto.setUsername(profile.getUser().getUsername());
+        dto.setFirstname(profile.getFirstname());
+        dto.setLastname(profile.getLastname());
+        dto.setAbout(profile.getAbout());
+        dto.setProfilePhotoUrl(profile.getProfilePhotoUrl());
 
-
-        // profilephoto
-
-        return outputDto;
+        return dto;
     }
 
     public static List<ProfileOutputDto> profileToList(List<Profile> profiles) {

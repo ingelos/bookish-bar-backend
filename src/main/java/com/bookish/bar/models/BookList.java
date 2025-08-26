@@ -1,12 +1,14 @@
 package com.bookish.bar.models;
 
-import com.bookish.bar.enums.Status;
+import com.bookish.bar.enums.BookListType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -21,20 +23,17 @@ public class BookList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JoinColumn(name = "userBookLists")
-    @ManyToOne
-    private Profile profile;
+    private String listName;
 
-//    @Column
-//    @ManyToOne
-//    @JoinColumn(name = "book_id")
-//    private Book book;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private BookListType type;
 
-    @Column
-    private Integer rating;
+    @OneToMany(mappedBy = "bookList", cascade = CascadeType.ALL)
+    private List<BookListItem> books = new ArrayList<>();
 
 }

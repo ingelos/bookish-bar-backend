@@ -8,8 +8,8 @@ import java.util.Optional;
 
 public interface ProfileRepository extends JpaRepository<Profile, Long> {
 
-    Optional<Profile> findByProfilePictureUrl(String profilePictureUrl);
-//    @Query("SELECT p FROM Profile p WHERE p.user.username = :username")
+//    Optional<Profile> findByProfilePhotoUrl(String profilePhotoUrl);
     Optional<Profile> findByUser_Username(String username);
 
+    Optional<Profile> findByUserId(Long userId);
 }

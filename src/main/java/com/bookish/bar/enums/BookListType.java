@@ -1,6 +1,6 @@
 package com.bookish.bar.enums;
 
-public enum Status {
+public enum BookListType {
 
     WANT_TO_READ,
     READING,

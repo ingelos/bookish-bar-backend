@@ -7,12 +7,15 @@ import com.bookish.bar.dtos.dtos.UserResponseDto;
 import com.bookish.bar.dtos.inputDtos.UserInputDto;
 import com.bookish.bar.dtos.mappers.UserMapper;
 import com.bookish.bar.dtos.outputDtos.UserOutputDto;
+import com.bookish.bar.enums.BookListType;
 import com.bookish.bar.exceptions.BadRequestException;
 import com.bookish.bar.exceptions.ResourceNotFoundException;
 import com.bookish.bar.exceptions.UsernameAlreadyExistsException;
 import com.bookish.bar.exceptions.UsernameNotFoundException;
 import com.bookish.bar.models.Authority;
+import com.bookish.bar.models.BookList;
 import com.bookish.bar.models.User;
+import com.bookish.bar.repositories.BookListRepository;
 import com.bookish.bar.repositories.UserRepository;
 import com.bookish.bar.utils.JwtUtil;
 import com.bookish.bar.utils.SecurityUtils;
@@ -35,12 +38,14 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityUtils securityUtils;
     private final JwtUtil jwtUtil;
+    private final BookListRepository bookListRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, JwtUtil jwtUtil) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, SecurityUtils securityUtils, JwtUtil jwtUtil, BookListRepository bookListRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.securityUtils = securityUtils;
         this.jwtUtil = jwtUtil;
+        this.bookListRepository = bookListRepository;
     }
 
 
@@ -57,6 +62,16 @@ public class UserService {
         user.getAuthorities().add(defaultAuthority);
 
         User savedUser = userRepository.save(user);
+
+        for (BookListType type : List.of(BookListType.WANT_TO_READ, BookListType.READ)) {
+            BookList list = new BookList();
+            list.setUser(user);
+            list.setType(type);
+            list.setListName(type.name());
+            bookListRepository.save(list);
+        }
+
+
         return UserMapper.userModelToDto(savedUser);
     }
 
@@ -146,4 +161,8 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(changePasswordDto.getNewPassword()));
         userRepository.save(user);
     }
+
+
+
+
 }

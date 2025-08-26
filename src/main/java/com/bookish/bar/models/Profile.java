@@ -25,7 +25,7 @@ public class Profile {
     @Column
     private String about;
 
-    private String profilePictureUrl;
+    private String profilePhotoUrl;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

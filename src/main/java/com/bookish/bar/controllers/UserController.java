@@ -8,6 +8,9 @@ import com.bookish.bar.dtos.inputDtos.ProfileInputDto;
 import com.bookish.bar.dtos.inputDtos.UserInputDto;
 import com.bookish.bar.dtos.outputDtos.ProfileOutputDto;
 import com.bookish.bar.dtos.outputDtos.UserOutputDto;
+import com.bookish.bar.exceptions.ResourceNotFoundException;
+import com.bookish.bar.models.Profile;
+import com.bookish.bar.repositories.ProfileRepository;
 import com.bookish.bar.services.PhotoService;
 import com.bookish.bar.services.ProfileService;
 import com.bookish.bar.services.UserService;
@@ -33,11 +36,13 @@ public class UserController {
     private final UserService userService;
     private final ProfileService profileService;
     private final PhotoService photoService;
+    private final ProfileRepository profileRepository;
 
-    public UserController(UserService userService, ProfileService profileService, PhotoService photoService) {
+    public UserController(UserService userService, ProfileService profileService, PhotoService photoService, ProfileRepository profileRepository) {
         this.userService = userService;
         this.profileService = profileService;
         this.photoService = photoService;
+        this.profileRepository = profileRepository;
     }
 
     // USER
@@ -135,26 +140,21 @@ public class UserController {
     public ResponseEntity<String> uploadProfilePicture(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
         try {
             String fileName = photoService.storeFile(file, id);
+
+            Profile profile = profileRepository.findByUserId(id)
+                    .orElseThrow(() -> new ResourceNotFoundException("Profile not found"));
+            profile.setProfilePhotoUrl(fileName);
+            profileRepository.save(profile);
+
             return ResponseEntity.ok("File uploaded successfully: " + fileName);
         } catch(IOException | java.io.IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("File upload failed.");
         }
     }
 
-    @GetMapping("/{id}/profile/photo/download/{fileName}")
-    public ResponseEntity<Resource> downloadProfilePicture(@PathVariable String fileName) {
-        Resource resource  = photoService.downLoadFile(fileName);
-        return ResponseEntity.ok()
-                .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
-                .body(resource);
-    }
-
     @DeleteMapping("/{id}/profile/photo")
-    public ResponseEntity<String> deleteProfilePicture(@PathVariable Long id) {
+    public ResponseEntity<String> deleteProfilePhoto(@PathVariable Long id) {
         photoService.deleteFile(id);
         return ResponseEntity.ok("File deleted successfully");
     }
-
-
 }
