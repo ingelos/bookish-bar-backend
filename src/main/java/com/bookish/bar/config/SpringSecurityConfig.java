@@ -60,14 +60,17 @@ public class SpringSecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/users/{id}/profile").hasAuthority("USER")
                         .requestMatchers(HttpMethod.GET, "/users/{id}/profile").hasAuthority("USER")
 
+
                         .requestMatchers(HttpMethod.PUT, "/users/{id}/profile").hasAuthority("USER")
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}/profile").hasAnyAuthority("USER", "ADMIN")
 
+
                         .requestMatchers(HttpMethod.GET, "/profiles").permitAll()
                         .requestMatchers(HttpMethod.GET, "/profiles/{username}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/profiles/{username}/photo").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/users/{id}/profile/photo").hasAuthority("USER")
-                        .requestMatchers(HttpMethod.GET, "/users/{id}/profile/photo/download/{filename}").hasAuthority("USER")
+
                         .requestMatchers(HttpMethod.DELETE, "/users/{id}/profile/photo").hasAnyAuthority("USER", "ADMIN")
 
 

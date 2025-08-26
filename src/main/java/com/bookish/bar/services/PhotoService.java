@@ -2,7 +2,9 @@ package com.bookish.bar.services;
 
 import com.bookish.bar.exceptions.ResourceNotFoundException;
 import com.bookish.bar.models.Profile;
+import com.bookish.bar.models.User;
 import com.bookish.bar.repositories.ProfileRepository;
+import com.bookish.bar.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -11,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -24,11 +27,13 @@ public class PhotoService {
     private final Path fileStoragePath;
     private final String fileStorageLocation;
     private final ProfileRepository profileRepository;
+    private final UserRepository userRepository;
 
-    public PhotoService(@Value("${my.upload_location}") String fileStorageLocation, ProfileRepository profileRepository) throws IOException {
+    public PhotoService(@Value("${my.upload_location}") String fileStorageLocation, ProfileRepository profileRepository, UserRepository userRepository) throws IOException {
         fileStoragePath = Paths.get(fileStorageLocation).toAbsolutePath().normalize();
         this.fileStorageLocation = fileStorageLocation;
         this.profileRepository = profileRepository;
+        this.userRepository = userRepository;
 
         Files.createDirectories(fileStoragePath);
     }
@@ -41,12 +46,16 @@ public class PhotoService {
 
         Profile profile = profileRepository.findById(profileId)
                         .orElseThrow(() -> new RuntimeException("Profile not found"));
-        profile.setProfilePictureUrl(fileName);
+        profile.setProfilePhotoUrl(fileName);
         profileRepository.save(profile);
         return fileName;
     }
 
-    public Resource downLoadFile(String fileName) {
+    public Resource downLoadFile(String fileName) throws FileNotFoundException {
+        if (fileName == null || fileName.isBlank()) {
+            throw new FileNotFoundException("No filename provided");
+        }
+
         Path path = Paths.get(fileStorageLocation).toAbsolutePath().resolve(fileName);
         Resource resource;
 
@@ -61,16 +70,19 @@ public class PhotoService {
         return resource;
     }
 
-    public void deleteFile(Long profileId) {
-        Profile profile = profileRepository.findById(profileId)
+    public void deleteFile(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        Profile profile = profileRepository.findById(user.getId())
                 .orElseThrow(() -> new RuntimeException("Profile not found"));
 
-        String fileName = profile.getProfilePictureUrl();
+        String fileName = profile.getProfilePhotoUrl();
         if (fileName != null) {
             Path path = Paths.get(fileStorageLocation).toAbsolutePath().resolve(fileName);
             try {
                 Files.deleteIfExists(path);
-                profile.setProfilePictureUrl(null);
+                profile.setProfilePhotoUrl(null);
                 profileRepository.save(profile);
             } catch (IOException e) {
                 throw new RuntimeException("Failed to delete file " + fileName, e);

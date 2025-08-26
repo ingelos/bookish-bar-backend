@@ -11,8 +11,8 @@ import com.bookish.bar.models.User;
 import com.bookish.bar.repositories.ProfileRepository;
 import com.bookish.bar.repositories.UserRepository;
 import com.bookish.bar.utils.SecurityUtils;
-import jakarta.annotation.Resource;
 import jakarta.transaction.Transactional;
+import org.springframework.core.io.Resource;
 import org.springframework.expression.AccessException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -133,6 +133,13 @@ public class ProfileService {
         userRepository.save(user);
         profileRepository.delete(profile);
     }
+
+
+
+
+
+    // PHOTO
+
 
 
 }
