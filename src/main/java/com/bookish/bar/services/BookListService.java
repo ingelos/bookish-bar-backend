@@ -1,8 +1,10 @@
 package com.bookish.bar.services;
 
 import com.bookish.bar.client.OpenLibraryClient;
+import com.bookish.bar.dtos.dtos.BookDto;
 import com.bookish.bar.dtos.dtos.BookListDto;
 import com.bookish.bar.dtos.dtos.BookListItemDto;
+import com.bookish.bar.dtos.mappers.BookMapper;
 import com.bookish.bar.enums.BookListType;
 import com.bookish.bar.models.Book;
 import com.bookish.bar.models.BookList;
@@ -52,8 +54,9 @@ public class BookListService {
 
         Book book = bookRepository.findById(openLibraryId)
                 .orElseGet(() -> {
-                    Book fetched = openLibraryClient.fetchBook(openLibraryId);
-                    return bookRepository.save(fetched);
+                    BookDto fetchedBookDto = openLibraryClient.fetchBook(openLibraryId);
+                    Book fetchedBook = BookMapper.toEntity(fetchedBookDto);
+                    return bookRepository.save(fetchedBook);
                 });
 
         BookList bookList = bookListRepository.findByUserAndType(user, type)
@@ -76,24 +79,45 @@ public class BookListService {
     }
 
     @Transactional
-    public void updateRating(User user, String openLibraryId, Integer rating) {
+    public BookListItem updateRating(User user, BookListType type, String openLibraryId, Integer newRating) {
         BookListItem item = bookListItemRepository
-                .findByUserAndBookAndListType(user, openLibraryId, BookListType.READ)
+                .findByUserAndBookAndListType(user, openLibraryId, type)
                 .orElseThrow(() -> new IllegalStateException("Book not on READ list"));
 
-        item.setRating(rating);
-        bookListItemRepository.save(item);
+        if (type != BookListType.READ) {
+            throw new IllegalStateException("Ratings are only allowed for READ books");
+        }
 
+        item.setRating(newRating);
+        return bookListItemRepository.save(item);
     }
 
     @Transactional
-    public BookListDto getUserList(User user, BookListType type) {
+    public BookListDto getUserBookList(User user, BookListType type) {
         BookList list = bookListRepository.findByUserAndType(user, type)
                 .orElseThrow(() -> new IllegalStateException("List not found"));
 
         return BookListDto.fromEntity(list);
     }
 
-    public void removeBookFromList(Long userId, BookListType type, Long itemId) {
+    public void removeBookFromList(User user, BookListType type, String openLibraryId) {
+        BookList list = bookListRepository.findByUserAndType(user, type)
+                .orElseThrow(() -> new IllegalStateException("List not found"));
+
+        Book book = bookRepository.findById(openLibraryId)
+                .orElseThrow(() -> new IllegalStateException("Book not found"));
+
+        BookListItem item = bookListItemRepository.findByBookListAndBook(list, book)
+                .orElseThrow(() -> new IllegalStateException("Book not in list"));
+
+        bookListItemRepository.delete(item);
+    }
+
+    @Transactional
+    public List<BookListItemDto> getUserBookListItems(User user, BookListType type) {
+        BookList list = bookListRepository.findByUserAndType(user, type)
+                .orElseThrow(() -> new IllegalStateException("List not found"));
+        return list.getBooks().stream().map(BookListItemDto::fromEntity)
+                .toList();
     }
 }

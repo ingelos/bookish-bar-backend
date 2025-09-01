@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public interface BookListItemRepository extends JpaRepository<BookListItem, Long> {
     boolean existsByBookListAndBook(BookList list, Book book);
-    List<BookListItem> findByBookListId(Long bookListId);
     List<BookListItem> findAllByUser(User user);
-    Optional<BookListItem> findByUserAndBookAndListType(User user, String openLibraryId, BookListType bookListType);
+    Optional<BookListItem> findByUserAndBookAndListType(User user, String openLibraryId, BookListType type);
+    Optional<BookListItem> findByBookListAndBook(BookList list, Book book);
 }
