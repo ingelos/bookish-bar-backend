@@ -14,5 +14,6 @@ public interface BookListItemRepository extends JpaRepository<BookListItem, Long
     boolean existsByBookListAndBook(BookList list, Book book);
     List<BookListItem> findAllByUser(User user);
     Optional<BookListItem> findByUserAndBookAndListType(User user, String openLibraryId, BookListType type);
-    Optional<BookListItem> findByBookListAndBook(BookList list, Book book);
+    Optional<BookListItem> findByBookListAndBook_OpenLibraryId(BookList list, String openLibraryId);
+
 }

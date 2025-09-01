@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookListRepository extends JpaRepository<BookList, Long> {
-//    List<BookList> findByUserId(Long userId);
     Optional<BookList> findByUserAndType(User user, BookListType type);
-
+    List<BookList> findByUser(User user);
 }

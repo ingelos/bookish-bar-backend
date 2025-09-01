@@ -1,9 +1,6 @@
 package com.bookish.bar.dtos.mappers;
-
 import com.bookish.bar.dtos.dtos.BookDto;
 import com.bookish.bar.models.Book;
-
-import java.util.List;
 
 public class BookMapper {
 

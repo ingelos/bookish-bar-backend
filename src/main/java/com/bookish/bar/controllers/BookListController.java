@@ -31,15 +31,7 @@ public class BookListController {
     }
 
 
-    @PostMapping("/{type}/books")
-    public ResponseEntity<Void> addBookToList(
-            @AuthenticationPrincipal User user,
-            @PathVariable BookListType type,
-            @RequestBody AddBookRequest request) {
 
-        bookListService.addBookToList(user, request.getOpenLibraryId(), type, request.getRating());
-        return ResponseEntity.ok().build();
-    }
 
     @GetMapping("/search")
     public ResponseEntity<List<BookDto>> searchBooks(@RequestParam String q) {
@@ -64,19 +56,18 @@ public class BookListController {
         return ResponseEntity.ok(items);
     }
 
-    @PutMapping("/lists/{type}/books/{openLibraryId}/rating")
-    public ResponseEntity<BookListItemDto> updateRating(
+    @PostMapping("/{type}/books")
+    public ResponseEntity<Void> addBookToList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
-            @PathVariable String openLibraryId,
-            @RequestBody UpdateRatingRequest request
-            ) {
-        BookListItem updatedItem = bookListService.updateRating(user, type, openLibraryId, request.rating());
-        return ResponseEntity.ok(BookListItemDto.fromEntity(updatedItem));
+            @RequestBody AddBookRequest request) {
+
+        bookListService.addBookToList(user, request.getOpenLibraryId(), type, request.getRating());
+        return ResponseEntity.ok().build();
     }
 
 
-    @DeleteMapping("/{type}/items/{openLibraryId}")
+    @DeleteMapping("/{type}/{openLibraryId}")
     public ResponseEntity<Void> removeBookFromList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
@@ -84,6 +75,18 @@ public class BookListController {
 
         bookListService.removeBookFromList(user, type, openLibraryId);
         return ResponseEntity.noContent().build();
+    }
+
+
+    @PutMapping("/read/{openLibraryId}/rating")
+    public ResponseEntity<BookListItemDto> updateRating(
+            @AuthenticationPrincipal User user,
+            @PathVariable BookListType type,
+            @PathVariable String openLibraryId,
+            @RequestBody UpdateRatingRequest request
+    ) {
+        BookListItem updatedItem = bookListService.updateRating(user, type, openLibraryId, request.rating());
+        return ResponseEntity.ok(BookListItemDto.fromEntity(updatedItem));
     }
 
 
