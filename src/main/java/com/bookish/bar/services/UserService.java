@@ -71,7 +71,6 @@ public class UserService {
             bookListRepository.save(list);
         }
 
-
         return UserMapper.userModelToDto(savedUser);
     }
 

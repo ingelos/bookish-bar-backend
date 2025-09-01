@@ -11,7 +11,7 @@ public class BookListDto {
     private Long id;
     private String listName;
     private BookListType type;
-    private List<BookDto> books;
+    private List<BookListItemDto> books;
 
     public static BookListDto fromEntity(BookList bookList) {
         BookListDto dto = new BookListDto();
@@ -19,7 +19,7 @@ public class BookListDto {
         dto.listName = bookList.getListName();
         dto.type = bookList.getType();
         dto.books = bookList.getBooks().stream()
-                .map(BookDto::fromEntity)
+                .map(BookListItemDto::fromEntity)
                 .toList();
         return dto;
     }
