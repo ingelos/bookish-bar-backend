@@ -8,6 +8,8 @@ import com.bookish.bar.repositories.BookRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class BookService {
 
@@ -34,5 +36,7 @@ public class BookService {
     }
 
 
-
+    public List<BookDto> searchBooks(String query, int page, int size) {
+        return openLibraryClient.searchBooks(query, page, size);
+    }
 }

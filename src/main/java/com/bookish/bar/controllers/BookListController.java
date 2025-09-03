@@ -23,21 +23,12 @@ import java.util.List;
 public class BookListController {
 
     private final BookListService bookListService;
-    private final OpenLibraryClient openLibraryClient;
 
-    public BookListController(BookListService bookListService, OpenLibraryClient openLibraryClient) {
+
+    public BookListController(BookListService bookListService) {
         this.bookListService = bookListService;
-        this.openLibraryClient = openLibraryClient;
     }
 
-
-
-
-    @GetMapping("/search")
-    public ResponseEntity<List<BookDto>> searchBooks(@RequestParam String q) {
-        List<BookDto> results = openLibraryClient.searchBooks(q);
-        return ResponseEntity.ok(results);
-    }
 
     @GetMapping("/{type}")
     public ResponseEntity<BookListDto> getUserList(

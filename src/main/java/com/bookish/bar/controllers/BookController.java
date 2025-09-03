@@ -6,10 +6,9 @@ import com.bookish.bar.dtos.mappers.BookMapper;
 import com.bookish.bar.models.Book;
 import com.bookish.bar.services.BookService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/books")
@@ -31,6 +30,14 @@ public class BookController {
     public ResponseEntity<BookDto> getBookFromDb(@PathVariable String openLibraryId) {
         Book book = bookService.getOrCreateBook(openLibraryId);
         return ResponseEntity.ok(BookMapper.toDto(book));
+    }
+
+    @GetMapping("/api/search")
+    public List<BookDto> searchBooks(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return bookService.searchBooks(query, page, size);
     }
 
 

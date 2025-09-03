@@ -46,8 +46,6 @@ public class OpenLibraryClient {
         if (authors != null && !authors.isEmpty()) {
             for (Map<String, Object> authorMap : authors) {
                 @SuppressWarnings("unchecked")
-//                Map<String, Object> authorObj = (Map<String, Object>) authorMap.get("author");
-//                if (authorObj != null) {
                     String authorKey = (String) ((Map<String, Object>) authorMap.get("author")).get("key");
                     String authorUrl = BASE_URL + authorKey + ".json";
 
@@ -85,7 +83,7 @@ public class OpenLibraryClient {
 
 
 
-    public List<BookDto> searchBooks(String query) {
+    public List<BookDto> searchBooks(String query, int page, int size) {
         String url = BASE_URL + "/search.json?q=" + UriUtils.encode(query, StandardCharsets.UTF_8);
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 url,
@@ -109,27 +107,39 @@ public class OpenLibraryClient {
     }
 
     private BookDto fromDocToBookDto(Map<String, Object> doc) {
-        String openLibraryId = (doc.get("key") != null) ? doc.get("key").toString().replace("/works/", "") : null;
-        String title = (String) doc.getOrDefault("title", "Unknown title");
+        BookDto dto = new BookDto();
+
+        String key = (String) doc.get("key");
+        if (key != null && key.startsWith("/works/")) {
+            dto.setOpenLibraryId(key.substring("/works/".length()));
+        } else {
+            dto.setOpenLibraryId("unknown");
+        }
+
+        dto.setTitle((String) doc.getOrDefault("title", "Unknown title"));
 
         @SuppressWarnings("unchecked")
-        List<String> authors = (List<String>) doc.getOrDefault("author_name", List.of());
-
-        Integer publishedYear = null;
-        if (doc.containsKey("first_publish_year")) {
-            publishedYear = (Integer) doc.get("first_publish_year");
+        List<String> authors = (List<String>) doc.get("author_name");
+        if (authors != null && !authors.isEmpty()) {
+            dto.setAuthors(authors);
+        } else {
+            dto.setAuthors(List.of("Unknown Author"));
         }
 
-        // covers
-        String coverUrl = null;
-        if (doc.containsKey("cover_i")) {
-            coverUrl = "https://covers.openlibrary.org/b/id/" + doc.get("cover_id") + "-M.jped";
+        Object year = doc.get("first_publish_year");
+        if (year instanceof Integer) {
+            dto.setPublishedYear((Integer) year);
+        } else {
+            dto.setPublishedYear(null);
         }
 
-        return new BookDto(openLibraryId, title, authors, publishedYear, coverUrl);
+        Object coverId = doc.get("cover_i");
+        if (coverId instanceof Integer) {
+            dto.setCoverUrl("https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg");
+        } else {
+            dto.setCoverUrl("/images/no-cover.png");
+        }
 
+        return dto;
     }
-
-
-
 }
