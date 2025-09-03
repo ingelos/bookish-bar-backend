@@ -9,6 +9,7 @@ import com.bookish.bar.models.Book;
 import com.bookish.bar.models.BookList;
 import com.bookish.bar.models.BookListItem;
 import com.bookish.bar.models.User;
+import com.bookish.bar.repositories.BookListItemRepository;
 import com.bookish.bar.services.BookListService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -19,18 +20,21 @@ import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/lists")
+@RequestMapping("/bookLists")
 public class BookListController {
 
     private final BookListService bookListService;
+    private final BookListItemRepository bookListItemRepository;
 
+    public record UserBookCounts(int all, int read, int wantToRead) {}
 
-    public BookListController(BookListService bookListService) {
+    public BookListController(BookListService bookListService, BookListItemRepository bookListItemRepository) {
         this.bookListService = bookListService;
+        this.bookListItemRepository = bookListItemRepository;
     }
 
 
-    @GetMapping("/{type}")
+    @GetMapping("/{listType}")
     public ResponseEntity<BookListDto> getUserList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type) {
@@ -39,7 +43,7 @@ public class BookListController {
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{type}/items")
+    @GetMapping("/{listType}/items")
     public ResponseEntity<List<BookListItemDto>> getUserBookListItems(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type) {
@@ -47,7 +51,8 @@ public class BookListController {
         return ResponseEntity.ok(items);
     }
 
-    @PostMapping("/{type}/books")
+
+    @PostMapping("/{listType}/books")
     public ResponseEntity<Void> addBookToList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
@@ -58,7 +63,7 @@ public class BookListController {
     }
 
 
-    @DeleteMapping("/{type}/{openLibraryId}")
+    @DeleteMapping("/{listType}/{openLibraryId}")
     public ResponseEntity<Void> removeBookFromList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
@@ -81,6 +86,13 @@ public class BookListController {
     }
 
 
+    @GetMapping("/counts")
+    public UserBookCounts getBookCounts(@AuthenticationPrincipal User user) {
+        int read = bookListItemRepository.countByUserAndBookList_Type(user, BookListType.READ);
+        int want = bookListItemRepository.countByUserAndBookList_Type(user, BookListType.WANT_TO_READ);
+        int all = read + want;
+        return new UserBookCounts(all, read, want);
+    }
 
 
 }
