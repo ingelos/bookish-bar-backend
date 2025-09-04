@@ -29,4 +29,8 @@ public class Book {
     private Integer publishedYear;
     private String coverUrl;
 
+    // detailed search
+    private String description;
+    private String firstSentence;
+
 }

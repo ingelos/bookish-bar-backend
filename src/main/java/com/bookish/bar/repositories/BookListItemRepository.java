@@ -15,5 +15,5 @@ public interface BookListItemRepository extends JpaRepository<BookListItem, Long
     List<BookListItem> findAllByUser(User user);
     Optional<BookListItem> findByUserAndBookAndListType(User user, String openLibraryId, BookListType type);
     Optional<BookListItem> findByBookListAndBook_OpenLibraryId(BookList list, String openLibraryId);
-
+    int countByUserAndBookList_Type(User user, BookListType bookListType);
 }

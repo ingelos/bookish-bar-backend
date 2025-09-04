@@ -19,6 +19,9 @@ public class BookDto{
     private Integer publishedYear;
     private String coverUrl;
 
+    private String description;
+    private String firstSentence;
+
     public static BookDto fromEntity(BookListItem item) {
         BookDto dto = new BookDto();
         dto.openLibraryId = item.getBook().getOpenLibraryId();
@@ -26,6 +29,8 @@ public class BookDto{
         dto.authors = item.getBook().getAuthors();
         dto.publishedYear = item.getBook().getPublishedYear();
         dto.coverUrl = item.getBook().getCoverUrl();
+        dto.description = item.getBook().getDescription();
+        dto.firstSentence = item.getBook().getFirstSentence();
         return dto;
     }
 
