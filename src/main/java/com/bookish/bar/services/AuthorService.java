@@ -19,8 +19,8 @@ public class AuthorService {
     }
 
     @Transactional
-    public AuthorDto getOrCreateAuthor(String authorId) {
-        Author author = authorRepository.findById(authorId).orElseGet(() -> {
+    public Author getOrCreateAuthor(String authorId) {
+        return authorRepository.findById(authorId).orElseGet(() -> {
             AuthorDto dto = openLibraryClient.fetchAuthor(authorId);
             Author entity = new Author();
             entity.setId(dto.getId());
@@ -30,10 +30,13 @@ public class AuthorService {
             entity.setDeathDate(dto.getDeathDate());
             return authorRepository.save(entity);
         });
-        return AuthorDto.fromEntity(author);
-
     }
 
+    public AuthorDto getAuthor(String authorId) {
+        Author author = authorRepository.findById(authorId)
+                .orElseThrow(() -> new RuntimeException("Author not found: " + authorId));
+        return AuthorDto.fromEntity(author);
+    }
 
 
 

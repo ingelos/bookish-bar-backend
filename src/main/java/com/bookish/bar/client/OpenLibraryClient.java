@@ -30,7 +30,8 @@ public class OpenLibraryClient {
                 + "&page=" + page + "&limit=" + size;
 
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {}
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
 
         Map<String, Object> body = response.getBody();
@@ -47,11 +48,12 @@ public class OpenLibraryClient {
 
     // Full details book fetch
 
-    public BookDto fetchBookDetails(String openLibraryId) {
-        String url = BASE_URL +  "/works/" + openLibraryId + ".json";
+    public BookDto fetchBook(String openLibraryId) {
+        String url = BASE_URL + "/works/" + openLibraryId + ".json";
 
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
+                }
         );
 
         Map<String, Object> data = response.getBody();
@@ -62,26 +64,18 @@ public class OpenLibraryClient {
         dto.setTitle((String) data.getOrDefault("title", "Unknown Title"));
 
         // Authors
-        List<String> authorNames = new ArrayList<>();
+        List<AuthorDto> authors = new ArrayList<>();
         @SuppressWarnings("unchecked")
-        List<Map<String, Object>> authors = (List<Map<String, Object>>) data.get("authors");
-        if (authors != null && !authors.isEmpty()) {
-            for (Map<String, Object> authorMap : authors) {
+        List<Map<String, Object>> authorRefs = (List<Map<String, Object>>) data.get("authors");
+        if (authorRefs != null) {
+            for (Map<String, Object> ref : authorRefs) {
                 @SuppressWarnings("unchecked")
-                    String authorKey = (String) ((Map<String, Object>) authorMap.get("author")).get("key");
-                    String authorUrl = BASE_URL + authorKey + ".json";
-
-                    ResponseEntity<Map<String, Object>> authorResponse = restTemplate.exchange(
-                            authorUrl, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}
-                    );
-
-                    Map<String, Object> authorData = authorResponse.getBody();
-                    if (authorData != null) {
-                       authorNames.add((String) authorData.getOrDefault("name", "Unknown Author"));
-                    }
-                }
+                String authorKey = (String) ((Map<String, Object>) ref.get("author")).get("key");
+                String authorId = authorKey.replace("/authors/", "");
+                authors.add(new AuthorDto() {{ setId(authorId); }});
             }
-        dto.setAuthors(authorNames);
+        }
+        dto.setAuthors(authors);
 
         // Published Year
         @SuppressWarnings("unchecked")
@@ -113,10 +107,6 @@ public class OpenLibraryClient {
     }
 
 
-
-
-
-
     // Mapper for search
 
     private BookDto fromDocToBookDto(Map<String, Object> doc) {
@@ -132,20 +122,33 @@ public class OpenLibraryClient {
         dto.setTitle((String) doc.getOrDefault("title", "Unknown title"));
 
         @SuppressWarnings("unchecked")
-        List<String> authors = (List<String>) doc.get("author_name");
-        if (authors != null && !authors.isEmpty()) {dto.setAuthors(authors);
-        } else {dto.setAuthors(List.of("Unknown Author"));
+        List<String> authorNames = (List<String>) doc.get("author_name");
+        if (authorNames != null && !authorNames.isEmpty()) {
+            dto.setAuthors(authorNames.stream().map(name -> {
+                AuthorDto a = new AuthorDto();
+                a.setName(name);
+                return a;
+            })
+                    .toList()
+            );
+        } else {
+            AuthorDto unknown = new AuthorDto();
+            unknown.setName("Unknown Author");
+            dto.setAuthors(List.of(unknown));
         }
 
         Object year = doc.get("first_publish_year");
-        if (year instanceof Integer) {dto.setPublishedYear((Integer) year);
-        } else {dto.setPublishedYear(null);
+        if (year instanceof Integer) {
+            dto.setPublishedYear((Integer) year);
+        } else {
+            dto.setPublishedYear(null);
         }
 
         Object coverId = doc.get("cover_i");
         if (coverId instanceof Integer) {
             dto.setCoverUrl("https://covers.openlibrary.org/b/id/" + coverId + "-M.jpg");
-        } else {dto.setCoverUrl("/images/no-cover.png");
+        } else {
+            dto.setCoverUrl("/images/no-cover.png");
         }
 
         return dto;
@@ -153,12 +156,13 @@ public class OpenLibraryClient {
 
     public AuthorDto fetchAuthor(String authorId) {
         String url = BASE_URL + "/authors" + authorId + ".json";
+
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
                 url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}
         );
 
         Map<String, Object> data = response.getBody();
-        if (data == null) throw new RuntimeException("No author found");
+        if (data == null) throw new RuntimeException("No data from OpenLibrary for author " + authorId);
 
         AuthorDto dto = new AuthorDto();
         dto.setId(authorId);
@@ -166,7 +170,7 @@ public class OpenLibraryClient {
         dto.setBio(data.get("bio") instanceof String ? (String) data.get("bio") : null);
         dto.setBirthDate((String) data.get("birth_date"));
         dto.setDeathDate((String) data.get("death_date"));
-        return dto;
 
+        return dto;
     }
 }

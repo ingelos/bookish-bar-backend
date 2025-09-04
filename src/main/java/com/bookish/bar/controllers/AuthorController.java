@@ -1,10 +1,8 @@
 package com.bookish.bar.controllers;
 
-import com.bookish.bar.client.OpenLibraryClient;
 import com.bookish.bar.dtos.dtos.AuthorDto;
-import com.bookish.bar.repositories.AuthorRepository;
 import com.bookish.bar.services.AuthorService;
-import org.springframework.security.access.AuthorizationServiceException;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,8 +19,8 @@ public class AuthorController {
     }
 
     @GetMapping("/{authorId}")
-    public AuthorDto getAuthor(@PathVariable String authorId)  {
-        return authorService.getOrCreateAuthor(authorId);
+    public ResponseEntity<AuthorDto> getAuthor(@PathVariable String authorId)  {
+        return ResponseEntity.ok(authorService.getAuthor(authorId));
     }
 
 
