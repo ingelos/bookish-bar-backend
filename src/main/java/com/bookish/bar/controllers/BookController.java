@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/books")
+@RequestMapping("/api/books")
 public class BookController {
 
     private final BookService bookService;
@@ -21,18 +21,11 @@ public class BookController {
     }
 
     @GetMapping("/{openLibraryId}")
-    public ResponseEntity<BookDto> getBook(@PathVariable String openLibraryId) {
-        BookDto dto = bookService.fetchBookFromApi(openLibraryId);
-        return ResponseEntity.ok(dto);
+    public BookDto getBookDetails(@PathVariable String openLibraryId) {
+        return bookService.getBookDetails(openLibraryId);
     }
 
-    @GetMapping("/db/{openLibraryId}")
-    public ResponseEntity<BookDto> getBookFromDb(@PathVariable String openLibraryId) {
-        Book book = bookService.getOrCreateBook(openLibraryId);
-        return ResponseEntity.ok(BookMapper.toDto(book));
-    }
-
-    @GetMapping("/api/search")
+    @GetMapping("/search")
     public List<BookDto> searchBooks(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int page,

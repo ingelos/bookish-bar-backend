@@ -31,7 +31,7 @@ public class BookService {
                 });
     }
 
-    public BookDto fetchBookFromApi(String openLibraryId) {
+    public BookDto getBookDetails(String openLibraryId) {
         return openLibraryClient.fetchBookDetails(openLibraryId);
     }
 

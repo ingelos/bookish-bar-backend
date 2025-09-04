@@ -22,7 +22,7 @@ public class OpenLibraryClient {
     private static final String BASE_URL = "https://openlibrary.org";
 
 
-    // LIGHTWEIGHT SEARCH
+    // Lightweight search
 
     public List<BookDto> searchBooks(String query, int page, int size) {
         String url = BASE_URL + "/search.json?q=" + UriUtils.encode(query, StandardCharsets.UTF_8)
@@ -44,7 +44,7 @@ public class OpenLibraryClient {
     }
 
 
-    // FULL DETAILS BOOK FETCH
+    // Full details book fetch
 
     public BookDto fetchBookDetails(String openLibraryId) {
         String url = BASE_URL +  "/works/" + openLibraryId + ".json";
@@ -116,7 +116,7 @@ public class OpenLibraryClient {
 
 
 
-    // LIGHT MAPPER FOR SEARCH
+    // Mapper for search
 
     private BookDto fromDocToBookDto(Map<String, Object> doc) {
         BookDto dto = new BookDto();
