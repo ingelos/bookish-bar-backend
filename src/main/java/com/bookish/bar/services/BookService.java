@@ -25,14 +25,14 @@ public class BookService {
     public Book getOrCreateBook(String openLibraryId) {
         return bookRepository.findById(openLibraryId)
                 .orElseGet(() -> {
-                    BookDto dto = openLibraryClient.fetchBook(openLibraryId);
+                    BookDto dto = openLibraryClient.fetchBookDetails(openLibraryId);
                     Book entity = BookMapper.toEntity(dto);
                     return bookRepository.save(entity);
                 });
     }
 
     public BookDto fetchBookFromApi(String openLibraryId) {
-        return openLibraryClient.fetchBook(openLibraryId);
+        return openLibraryClient.fetchBookDetails(openLibraryId);
     }
 
 

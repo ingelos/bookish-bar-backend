@@ -34,16 +34,15 @@ public class BookListController {
     }
 
 
-    @GetMapping("/{listType}")
-    public ResponseEntity<BookListDto> getUserList(
+    @GetMapping("/{type}")
+    public ResponseEntity<BookListDto> getUserBooks(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type) {
-
         BookListDto dto = bookListService.getUserBookList(user, type);
         return ResponseEntity.ok(dto);
     }
 
-    @GetMapping("/{listType}/items")
+    @GetMapping("/{type}/items")
     public ResponseEntity<List<BookListItemDto>> getUserBookListItems(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type) {
@@ -52,7 +51,7 @@ public class BookListController {
     }
 
 
-    @PostMapping("/{listType}/books")
+    @PostMapping("/{type}/books")
     public ResponseEntity<Void> addBookToList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
@@ -63,7 +62,7 @@ public class BookListController {
     }
 
 
-    @DeleteMapping("/{listType}/{openLibraryId}")
+    @DeleteMapping("/{type}/{openLibraryId}")
     public ResponseEntity<Void> removeBookFromList(
             @AuthenticationPrincipal User user,
             @PathVariable BookListType type,
