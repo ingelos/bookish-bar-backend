@@ -1,5 +1,6 @@
 package com.bookish.bar.client;
 
+import com.bookish.bar.dtos.dtos.AuthorDto;
 import com.bookish.bar.dtos.dtos.BookDto;
 import com.bookish.bar.models.Book;
 import org.apache.coyote.Response;
@@ -148,5 +149,24 @@ public class OpenLibraryClient {
         }
 
         return dto;
+    }
+
+    public AuthorDto fetchAuthor(String authorId) {
+        String url = BASE_URL + "/authors" + authorId + ".json";
+        ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                url, HttpMethod.GET, null, new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+
+        Map<String, Object> data = response.getBody();
+        if (data == null) throw new RuntimeException("No author found");
+
+        AuthorDto dto = new AuthorDto();
+        dto.setId(authorId);
+        dto.setName((String) data.getOrDefault("name", "Unknown Author"));
+        dto.setBio(data.get("bio") instanceof String ? (String) data.get("bio") : null);
+        dto.setBirthDate((String) data.get("birth_date"));
+        dto.setDeathDate((String) data.get("death_date"));
+        return dto;
+
     }
 }
