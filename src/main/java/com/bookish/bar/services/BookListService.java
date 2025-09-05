@@ -8,7 +8,6 @@ import com.bookish.bar.models.BookListItem;
 import com.bookish.bar.models.User;
 import com.bookish.bar.repositories.BookListItemRepository;
 import com.bookish.bar.repositories.BookListRepository;
-import com.bookish.bar.repositories.BookRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
@@ -77,7 +76,8 @@ public class BookListService {
         return bookListItemRepository.save(item);
     }
 
-    // Get user's book list (want-to-read, read, or virtual all)
+
+    // Get user book list (want-to-read, read, or virtual all)
     @Transactional
     public BookListDto getUserBookList(User user, BookListType type) {
         List<BookListItem> items;
