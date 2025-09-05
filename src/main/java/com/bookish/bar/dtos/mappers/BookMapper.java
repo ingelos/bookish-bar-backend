@@ -1,4 +1,5 @@
 package com.bookish.bar.dtos.mappers;
+import com.bookish.bar.dtos.dtos.AuthorDto;
 import com.bookish.bar.dtos.dtos.BookDto;
 import com.bookish.bar.models.Author;
 import com.bookish.bar.models.Book;
@@ -10,29 +11,20 @@ import java.util.stream.Collectors;
 
 public class BookMapper {
 
-    public static Book toEntity(BookDto dto, AuthorService authorService) {
+    public static Book toEntity(BookDto dto) {
         Book book = new Book();
         book.setOpenLibraryId(dto.getOpenLibraryId());
         book.setTitle(dto.getTitle());
-
         book.setPublishedYear(dto.getPublishedYear());
         book.setCoverUrl(dto.getCoverUrl());
-
-        Set<Author> authors = dto.getAuthors().stream()
-                        .map(a -> authorService.getOrCreateAuthorEntity(a))
-                                .collect(Collectors.toSet());
-        book.setAuthors(authors);
+        book.setDescription(dto.getDescription());
+        book.setFirstSentence(dto.getFirstSentence());
 
         return book;
     }
 
     public static BookDto toDto(Book book) {
-        BookDto dto = new BookDto();
-        dto.setOpenLibraryId(book.getOpenLibraryId());
-        dto.setTitle(book.getTitle());
-        dto.setAuthors(book.getAuthors());
-        dto.setPublishedYear(book.getPublishedYear());
-        dto.setCoverUrl(book.getCoverUrl());
-        return dto;
+        return BookDto.fromEntity(book);
     }
+
 }

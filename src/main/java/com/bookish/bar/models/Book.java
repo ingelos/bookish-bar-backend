@@ -24,11 +24,8 @@ public class Book {
     private String openLibraryId;
 
     private String title;
-//    @ElementCollection(fetch = FetchType.EAGER)
     private Integer publishedYear;
     private String coverUrl;
-
-    // detailed search
     private String description;
     private String firstSentence;
 

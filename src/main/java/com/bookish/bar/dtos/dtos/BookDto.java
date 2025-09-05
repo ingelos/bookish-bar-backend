@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -18,10 +19,12 @@ public class BookDto{
     private String title;
     private Integer publishedYear;
     private String coverUrl;
+
+    private List<AuthorDto> authors = new ArrayList<>();
+
+    // nullable, only used for fetching book details
     private String description;
     private String firstSentence;
-    private List<AuthorDto> authors;
-
 
     public static BookDto fromEntity(Book book) {
         BookDto dto = new BookDto();
@@ -40,19 +43,6 @@ public class BookDto{
 
         return dto;
     }
-
-//    public static BookDto fromEntity(BookListItem item) {
-//        BookDto dto = new BookDto();
-//        dto.openLibraryId = item.getBook().getOpenLibraryId();
-//        dto.title = item.getBook().getTitle();
-//        dto.authors = item.getBook().getAuthors();
-//        dto.publishedYear = item.getBook().getPublishedYear();
-//        dto.coverUrl = item.getBook().getCoverUrl();
-//        dto.description = item.getBook().getDescription();
-//        dto.firstSentence = item.getBook().getFirstSentence();
-//        return dto;
-//    }
-
 
 
 }

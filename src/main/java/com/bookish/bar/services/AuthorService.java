@@ -2,10 +2,12 @@ package com.bookish.bar.services;
 
 import com.bookish.bar.client.OpenLibraryClient;
 import com.bookish.bar.dtos.dtos.AuthorDto;
+import com.bookish.bar.dtos.dtos.BookDto;
 import com.bookish.bar.models.Author;
 import com.bookish.bar.repositories.AuthorRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 public class AuthorService {
@@ -21,7 +23,7 @@ public class AuthorService {
     @Transactional
     public Author getOrCreateAuthor(String authorId) {
         return authorRepository.findById(authorId).orElseGet(() -> {
-            AuthorDto dto = openLibraryClient.fetchAuthor(authorId);
+            AuthorDto dto = openLibraryClient.fetchAuthorDetails(authorId);
             Author entity = new Author();
             entity.setId(dto.getId());
             entity.setName(dto.getName());
@@ -32,12 +34,16 @@ public class AuthorService {
         });
     }
 
-    public AuthorDto getAuthor(String authorId) {
-        Author author = authorRepository.findById(authorId)
-                .orElseThrow(() -> new RuntimeException("Author not found: " + authorId));
+    @Transactional
+    public AuthorDto getAuthorDetails(String authorId) {
+        Author author = getOrCreateAuthor(authorId);
         return AuthorDto.fromEntity(author);
     }
 
+    @Transactional
+    public List<BookDto> getAuthorWorks(String authorId) {
+        return openLibraryClient.fetchAuthorWorks(authorId);
+    }
 
 
 }

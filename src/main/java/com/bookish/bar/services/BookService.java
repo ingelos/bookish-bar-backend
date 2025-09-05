@@ -8,7 +8,6 @@ import com.bookish.bar.models.Book;
 import com.bookish.bar.repositories.BookRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -30,27 +29,23 @@ public class BookService {
     public Book getOrCreateBook(String openLibraryId) {
         return bookRepository.findById(openLibraryId).orElseGet(() -> {
                     BookDto dto = openLibraryClient.fetchBook(openLibraryId);
+                    Book entity = BookMapper.toEntity(dto);
 
-                    Book entity = new Book();
-                    entity.setOpenLibraryId(dto.getOpenLibraryId());
-                    entity.setTitle(dto.getTitle());
-                    entity.setPublishedYear(dto.getPublishedYear());
-                    entity.setCoverUrl(dto.getCoverUrl());
-                    entity.setDescription(dto.getDescription());
-                    entity.setFirstSentence(dto.getFirstSentence());
+            if (dto.getAuthors() != null) {
+                Set<Author> authors = dto.getAuthors().stream()
+                        .map(authorDto -> authorService.getOrCreateAuthor(authorDto.getId()))
+                        .collect(Collectors.toSet());
 
-                    Set<Author> authors = dto.getAuthors().stream().map(a -> authorService.getOrCreateAuthor(a.getId()))
-                            .collect(Collectors.toSet());
-                    entity.setAuthors(authors);
+                entity.setAuthors(authors);
+            }
 
-                    return bookRepository.save(entity);
+            return bookRepository.save(entity);
                 });
     }
 
     public BookDto getBookDetails(String openLibraryId) {
         return openLibraryClient.fetchBook(openLibraryId);
     }
-
 
     public List<BookDto> searchBooks(String query, int page, int size) {
         return openLibraryClient.searchBooks(query, page, size);
